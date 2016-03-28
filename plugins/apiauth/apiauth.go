@@ -96,9 +96,9 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
 			ctx.WriteString("not exist this appid")
 			return
 		}
-		if ctx.Input.Header("X-Beego-Signature") == "" {
+		if ctx.Input.Header("X-Signature") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("miss query param: X-Beego-Signature")
+			ctx.WriteString("miss query param: X-Signature")
 			return
 		}
 		if ctx.Input.Query("timestamp") == "" {
