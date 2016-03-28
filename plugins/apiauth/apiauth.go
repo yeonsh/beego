@@ -96,9 +96,9 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
 			ctx.WriteString("not exist this appid")
 			return
 		}
-		if ctx.Input.Query("signature") == "" {
+		if ctx.Input.Header("X-Beego-Signature") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("miss query param: signature")
+			ctx.WriteString("miss query param: X-Beego-Signature")
 			return
 		}
 		if ctx.Input.Query("timestamp") == "" {
@@ -118,7 +118,7 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
 			ctx.WriteString("timeout! the request time is long ago, please try again")
 			return
 		}
-		if ctx.Input.Query("signature") !=
+		if ctx.Input.Header("X-Beego-Signature") !=
 			Signature(appsecret, ctx.Input.Method(), ctx.Request.Form, ctx.Input.URI()) {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("auth failed")
@@ -148,7 +148,9 @@ func Signature(appsecret, method string, params url.Values, RequestURI string) (
 	sha256 := sha256.New
 	hash := hmac.New(sha256, []byte(appsecret))
 	hash.Write([]byte(stringToSign))
-	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
+	signature := base64.StdEncoding.EncodeToString(hash.Sum(nil))
+	beego.Error(signature)
+	return signature
 }
 
 type valSorter struct {
